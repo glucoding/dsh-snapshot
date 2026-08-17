@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import type { InputActions } from '@deepseek-ai/dsh-client-ui-conversation/client'
 import { captureNodeToPng, captureViewportToPng, blobToFile, type Rect } from './capture.ts'
 import { RegionOverlay } from './RegionOverlay.tsx'
@@ -14,7 +14,7 @@ export interface ScreenshotButtonProps {
 export function ScreenshotButton({ inputActions, actions, t }: ScreenshotButtonProps): JSX.Element {
   const [open, setOpen] = useState(false)
   const [selecting, setSelecting] = useState(false)
-  const busy = useRef(false)
+  const [busy, setBusy] = useState(false)
 
   async function finish(blob: Blob): Promise<void> {
     const file = blobToFile(blob, `screenshot-${Date.now()}.png`)
@@ -25,23 +25,25 @@ export function ScreenshotButton({ inputActions, actions, t }: ScreenshotButtonP
   }
 
   async function captureViewport(): Promise<void> {
-    busy.current = true
+    if (busy) return
+    setBusy(true)
     try { await finish(await captureViewportToPng({ pixelRatio: window.devicePixelRatio })) }
-    finally { busy.current = false; setOpen(false) }
+    finally { setBusy(false); setOpen(false) }
   }
 
   async function captureRegion(rect: Rect): Promise<void> {
+    if (busy) return
     setSelecting(false)
-    busy.current = true
+    setBusy(true)
     try {
       const blob = await captureNodeToPng(document.body, { pixelRatio: window.devicePixelRatio, rect })
       await finish(blob)
-    } finally { busy.current = false }
+    } finally { setBusy(false) }
   }
 
   return (
     <>
-      <button type="button" disabled={busy.current} aria-label={t('button.label')} onClick={() => setOpen(v => !v)}>
+      <button type="button" disabled={busy} aria-label={t('button.label')} onClick={() => setOpen(v => !v)}>
         {t('button.label')}
       </button>
       {open ? (
