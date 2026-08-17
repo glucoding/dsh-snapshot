@@ -12,7 +12,7 @@ describe('RegionOverlay', () => {
   it('completes with a normalized rect on mouseup after a drag', () => {
     const onComplete = vi.fn()
     render(<RegionOverlay onComplete={onComplete} onCancel={vi.fn()} t={t} />)
-    const layer = screen.getByRole('presentation')
+    const layer = screen.getByRole('dialog')
     fireEvent.mouseDown(layer, { clientX: 10, clientY: 10 })
     fireEvent.mouseMove(layer, { clientX: 100, clientY: 60 })
     fireEvent.mouseUp(layer, { clientX: 100, clientY: 60 })

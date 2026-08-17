@@ -26,7 +26,7 @@ export function RegionOverlay({ onComplete, onCancel, t }: RegionOverlayProps): 
 
   return (
     <div
-      role="presentation"
+      role="dialog"
       aria-label={t('overlay.aria')}
       style={{ position: 'fixed', inset: 0, cursor: 'crosshair', zIndex: 1000 }}
       onMouseDown={(e) => { setStart({ x: e.clientX, y: e.clientY }); setEnd({ x: e.clientX, y: e.clientY }) }}
