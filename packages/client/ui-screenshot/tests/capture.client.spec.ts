@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
-import { describe, expect, it } from 'vitest'
-import { clampDimensions, clampPixelRatio, normalizeRegion, viewportRect } from '../src/client/capture.ts'
+import { describe, expect, it, vi } from 'vitest'
+import { toPng } from 'html-to-image'
+import { blobToFile, captureViewportToPng, clampDimensions, clampPixelRatio, normalizeRegion, viewportRect } from '../src/client/capture.ts'
+
+vi.mock('html-to-image', () => ({ toPng: vi.fn(async () => 'data:image/png;base64,AAAA') }))
 
 describe('capture geometry', () => {
   it('clamps devicePixelRatio to 2', () => {
@@ -23,5 +26,17 @@ describe('capture geometry', () => {
     const r = viewportRect()
     expect(r.width).toBeGreaterThan(0)
     expect(r.height).toBeGreaterThan(0)
+  })
+})
+
+describe('html-to-image capture backend', () => {
+  it('captures the viewport through toPng with a clamped pixel ratio', async () => {
+    await captureViewportToPng({ pixelRatio: 3 })
+    expect(toPng).toHaveBeenCalledWith(document.documentElement, expect.objectContaining({ pixelRatio: 2 }))
+  })
+  it('wraps a Blob into a File with image/png type and the given name', () => {
+    const f = blobToFile(new Blob(['x']), 'shot.png')
+    expect(f.type).toBe('image/png')
+    expect(f.name).toBe('shot.png')
   })
 })

@@ -1,3 +1,5 @@
+import { toPng } from 'html-to-image'
+
 /** Pure capture geometry and size-limit math; the html-to-image call lives beside it. */
 export interface Rect { left: number; top: number; width: number; height: number }
 
@@ -32,3 +34,28 @@ export function clampDimensions(width: number, height: number, maxBytes: number)
   }
   return { width: w, height: h }
 }
+
+export async function captureViewportToPng(opts: { pixelRatio: number }): Promise<Blob> {
+  const dataUrl = await toPng(document.documentElement, {
+    pixelRatio: clampPixelRatio(opts.pixelRatio), cacheBust: true,
+    width: window.innerWidth, height: window.innerHeight,
+  })
+  return await (await fetch(dataUrl)).blob()
+}
+
+export async function captureNodeToPng(node: HTMLElement, opts: { pixelRatio: number; rect?: Rect }): Promise<Blob> {
+  const style = opts.rect === undefined ? {} : {
+    width: String(opts.rect.width), height: String(opts.rect.height),
+    transform: `translate(${-opts.rect.left}px, ${-opts.rect.top}px)`,
+  }
+  const dataUrl = await toPng(node, {
+    pixelRatio: clampPixelRatio(opts.pixelRatio), cacheBust: true, style,
+    ...(opts.rect === undefined ? {} : { width: opts.rect.width, height: opts.rect.height }),
+  })
+  return await (await fetch(dataUrl)).blob()
+}
+
+export function blobToFile(blob: Blob, name: string): File {
+  return new File([blob], name, { type: 'image/png' })
+}
+
