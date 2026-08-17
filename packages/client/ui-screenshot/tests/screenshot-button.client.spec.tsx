@@ -25,7 +25,7 @@ describe('ScreenshotButton', () => {
       createDraftImages: vi.fn((files: readonly File[]) => files.map(() => ({ id: 'd1', previewUrl: 'blob:x', file: files[0] })) as never),
       releaseDraftImages: release,
     }
-    render(<ScreenshotButton inputActions={makeInputActions(addImages) as never} actions={actions} t={t} />)
+    render(<ScreenshotButton inputActions={makeInputActions(addImages) as never} {...actions} t={t} />)
     fireEvent.click(screen.getByRole('button', { name: zh['button.label'] }))
     fireEvent.click(screen.getByRole('menuitem', { name: zh['mode.viewport'] }))
     await waitFor(() => expect(addImages).toHaveBeenCalled())
@@ -39,7 +39,7 @@ describe('ScreenshotButton', () => {
       createDraftImages: vi.fn(() => [{ id: 'd1', previewUrl: 'blob:x', file: new File(['x'], 's.png', { type: 'image/png' }) }]) as never,
       releaseDraftImages: release,
     }
-    render(<ScreenshotButton inputActions={makeInputActions(addImages) as never} actions={actions} t={t} />)
+    render(<ScreenshotButton inputActions={makeInputActions(addImages) as never} {...actions} t={t} />)
     fireEvent.click(screen.getByRole('button', { name: zh['button.label'] }))
     fireEvent.click(screen.getByRole('menuitem', { name: zh['mode.viewport'] }))
     await waitFor(() => expect(release).toHaveBeenCalledTimes(1))

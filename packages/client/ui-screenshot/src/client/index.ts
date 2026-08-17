@@ -24,7 +24,7 @@ export function apply(ctx: ClientContext): void {
     id: 'screenshot',
     order: 10,
     locale: NS,
-    inject: (): ScreenshotButtonActions => ({
+    inject: (_sessionId): ScreenshotButtonActions => ({
       createDraftImages: (files) => ctx.conversation.createDraftImages(files),
       releaseDraftImages: (attachments) => ctx.conversation.releaseDraftImages(attachments),
     }),

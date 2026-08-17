@@ -1,26 +1,24 @@
 import { useState } from 'react'
 import type { InputActions } from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type { PropsLocale } from '@deepseek-ai/dsh-client-ui-slots'
 import { captureNodeToPng, captureViewportToPng, blobToFile, type Rect } from './capture.ts'
 import { RegionOverlay } from './RegionOverlay.tsx'
 import type { ScreenshotButtonActions } from './slots.ts'
-import type { ScreenshotKey } from './locales.ts'
 
-export interface ScreenshotButtonProps {
+export interface ScreenshotButtonProps extends ScreenshotButtonActions {
   inputActions: Pick<InputActions, 'addImages'>
-  actions: ScreenshotButtonActions
-  t(key: ScreenshotKey): string
 }
 
-export function ScreenshotButton({ inputActions, actions, t }: ScreenshotButtonProps): JSX.Element {
+export function ScreenshotButton({ inputActions, createDraftImages, releaseDraftImages, t }: ScreenshotButtonProps & PropsLocale<'screenshot'>): JSX.Element {
   const [open, setOpen] = useState(false)
   const [selecting, setSelecting] = useState(false)
   const [busy, setBusy] = useState(false)
 
   async function finish(blob: Blob): Promise<void> {
     const file = blobToFile(blob, `screenshot-${Date.now()}.png`)
-    const attachments = actions.createDraftImages([file])
+    const attachments = createDraftImages([file])
     if (!inputActions.addImages(attachments.map(a => a.id))) {
-      actions.releaseDraftImages(attachments)
+      releaseDraftImages(attachments)
     }
   }
 
