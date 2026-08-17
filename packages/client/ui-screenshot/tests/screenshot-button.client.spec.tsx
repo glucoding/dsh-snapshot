@@ -2,7 +2,9 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ScreenshotButton } from '../src/client/ScreenshotButton.tsx'
-import { zh, type ScreenshotKey } from '../src/client/locales.ts'
+import { zh } from '../src/client/locales.ts'
+import { makeTranslate } from '@deepseek-ai/dsh-client-test-runtime'
+import { zh as commonZh } from '@deepseek-ai/dsh-client-locale/src/locales/zh.ts'
 import type { ScreenshotButtonActions } from '../src/client/slots.ts'
 
 vi.mock('../src/client/capture.ts', async (importOriginal) => {
@@ -10,7 +12,7 @@ vi.mock('../src/client/capture.ts', async (importOriginal) => {
   return { ...mod, captureViewportToPng: vi.fn(async () => new Blob(['png'])) }
 })
 
-const t = (k: ScreenshotKey) => zh[k]
+const t = makeTranslate(zh, commonZh)
 afterEach(cleanup)
 
 function makeInputActions(addImages = vi.fn(() => true)) {
